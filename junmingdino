@@ -1,0 +1,193 @@
+#include <stdio.h>
+#include <windows.h> // GotoXY함수를 사용하기 위한 헤더파일 
+#include <conio.h>
+#include <time.h>
+#define DINO_BOTTOM_Y 12
+#define OBJECT_BOTTOM_Y 20
+#define OBJECT_BOTTOM_X 45
+
+// 콘솔 창의 크기와 제목을 지정하는 함수
+void SetConsoleView()
+{
+	system("mode con:cols=100 lines=25");
+	system("title JumpingDinogame");
+}
+
+//커서의 위치를 x축,y축으로 이동하는 함수
+void GotoXY(int x, int y)
+{
+	COORD Pos; // x, y 값을 멤버로 가지는 구조체타입 
+	Pos.X = 2 * x;
+	Pos.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);	
+} 
+
+// 키보드의 입력을 받고, 입력된 키의 값을 반환하는 함수
+int GetKeyDown()
+{
+	if (_kbhit() != 0)
+	{
+		return _getch();	
+	}
+	return 0;	
+} 
+
+// 공룡그리기 
+void DrawDino(int dinoY)
+{
+	GotoXY(0, dinoY);
+	static bool legFlag = true;
+	printf("      ㅗㅗㅗ\n");
+	printf("    ㅗㅗㅗㅗㅗ\n");
+	printf("   ㅗㅗㅗㅗㅗㅗ \n"); 
+	printf("    ㅗㅗㅗㅗㅗㅗ \n");
+	printf("ㅗ   ㅗㅗㅗㅗㅗ\n");
+	printf("ㅗㅗ   ㅗㅗㅗ \n");
+	printf("ㅗㅗ  ㅗㅗㅗ\n");
+	printf(" ㅗ ㅗㅗㅗㅗ\n");
+	printf(" ㅗㅗㅗㅗㅗ\n");
+	printf("  ㅗㅗㅗㅗㅗ\n");
+	printf("   ㅗㅗㅗㅗ\n");	
+	if (legFlag)
+	{
+		printf(" ㅗ  ㅗㅗㅗ  \n");
+		printf("  ㅗ \n");
+		legFlag = false;	
+	}
+	else
+	{
+		printf("  ㅗㅗㅗ ㅗ \n");
+		printf("       ㅗ  \n");
+		legFlag = true;	
+	} 
+	
+} 
+
+// 오브젝트 그리기
+void DrawObject(int objectX)
+{
+	GotoXY(objectX, OBJECT_BOTTOM_Y);
+	printf("ㅜㅜㅜ");
+	GotoXY(objectX, OBJECT_BOTTOM_Y+1);
+	printf("ㅜㅜㅜ");	
+	GotoXY(objectX, OBJECT_BOTTOM_Y+2);
+	printf(" ㅜㅜ ");
+	GotoXY(objectX, OBJECT_BOTTOM_Y+3);
+	printf(" ㅜㅜ ");
+	GotoXY(objectX, OBJECT_BOTTOM_Y+4);
+	printf(" . . ");
+}
+
+// 공룡이 오브젝트에 출돌했을 때 게임오버 출력
+void DrawGameOver(const int score)
+{
+	system("cls"); // 게임화면 지워줌
+	int x = 18; // x축 +방향으로 18 이동
+	int y = 8; // y축 -방향으로 8만큼 이동
+	GotoXY(x, y);
+	printf("===========================");
+	GotoXY(x, y + 1);
+	printf("======G A M E O V E R======");
+	GotoXY(x, y + 2);
+	printf("===========================");
+	GotoXY(x - 5, y + 10);
+	printf("점수 :  %d", score);
+	
+	printf("\n\n\n\n\n\n\n\n\n");
+	system("pause");
+	 
+} 
+
+// 충돌했으면 true. 아니면 false
+bool isCollision(const int objectX, const int dinoY)
+{
+	//오브젝트의 X가 공룡의 몸체쪽에 있을 때 공룡의 높이가 충분하지 않다면 충돌로 처리한다.
+	GotoXY(0, 0);
+	if (objectX <= 6 && objectX >= 4 && dinoY > 8)
+	{
+		return true;
+	}	
+	return false;
+} 
+
+int main()
+{
+	SetConsoleView();
+	
+	while(true) // 게임루프 
+	{
+		//게임시작시 초기화 
+		bool isJumping = false;
+		bool isBottom = true;
+		const int gravity = 3; // 중력, 즉 공룡이 떨어지는 속도 설정 
+	
+		int dinoY = DINO_BOTTOM_Y;
+		int objectX = OBJECT_BOTTOM_X;
+	
+		int score = 0; // 점수 초기화 
+		clock_t start, curr; 
+		start = clock(); // 시작시간 초기화 
+	
+		while (true) // 한 판에 대한 루프
+		{
+			// 충돌체크 오브젝트의 x값과 공룡의 y값으로 판단
+			if (isCollision(objectX, dinoY))
+				break;
+			
+			// space(공백)을 입력받고 바닥에있으면 점프
+			if (GetKeyDown() == ' ' && isBottom)
+			{
+				isJumping = true;
+				isBottom = false; 
+			}
+		
+		
+			// 점프중이라면 Y좌표값 감소, 점프하다가 공중에서 정지 후 하강하면  Y를 증가
+			if(isJumping){
+				dinoY -= gravity;
+			}
+			else
+			{
+				dinoY += gravity;	
+			} 
+		
+			// Y가 계속해서 증가하는걸 막기 위해 바닥을 생성 
+			if (dinoY >= DINO_BOTTOM_Y)
+			{
+				dinoY = DINO_BOTTOM_Y;
+				isBottom = true;
+			}
+		
+			//오브젝트가 왼쪽(x의 음의방향)으로 가도록하고 오브젝트의 위치가 왼쪽 끝으로가면 다시 오른쪽 끝으로 소환
+			objectX -= 4; //오브젝트 이동 속도 
+			if(objectX <= 0)
+			{
+				objectX = OBJECT_BOTTOM_X;
+			}
+		
+			// 점프의 맨 위를 찍으면 점프가 끝남
+			if (dinoY <= 3)
+			{
+				isJumping = false;	
+			}
+		
+			DrawDino(dinoY);  // 공룡 그림 
+			DrawObject(objectX);  // 오브젝트 그림 
+		
+			curr = clock(); // 현재시간 받아오기 
+			if (((curr - start) / CLOCKS_PER_SEC) >= 1) // 1초 지나면  
+			{
+				score++; // 점수 증가 
+				start = clock(); // 시작시간 초기화	
+			}
+			Sleep(60);
+			system("cls");  // clear
+		
+			//점수를 항상 출력해주면서, 1초가 지날 때 마다 ++해줌 
+			GotoXY(22, 0); // 커서를 가운데 위쪽으로 옮김 
+			printf("Score : %d", score); // 점수 출력 
+		}
+		DrawGameOver(score); 
+	}
+	return 0;
+}
