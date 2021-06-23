@@ -101,7 +101,7 @@ void DrawGameOver(const int score)
 // 충돌했으면 true. 아니면 false
 bool isCollision(const int objectX, const int dinoY)
 {
-	//오브젝트의 X가 공룡의 몸체쪽에 있을 때 공룡의 높이가 충분하지 않다면 충돌로 처리한다.
+	//// 오브젝트가 닫힌구간 x 구간 [4,6]구간에 있고 y = 8보다 아래에 있으면 충돌로 처리
 	GotoXY(0, 0);
 	if (objectX <= 6 && objectX >= 4 && dinoY > 8)
 	{
