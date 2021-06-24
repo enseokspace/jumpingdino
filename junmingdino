@@ -10,7 +10,7 @@
 void SetConsoleView()
 {
 	system("mode con:cols=100 lines=25");
-	system("title JumpingDinogame");
+	system("title JumpingDino");
 }
 
 //커서의 위치를 x축,y축으로 이동하는 함수
@@ -48,13 +48,13 @@ void DrawDino(int dinoY)
 	printf(" ㅗㅗㅗㅗㅗ\n");
 	printf("  ㅗㅗㅗㅗㅗ\n");
 	printf("   ㅗㅗㅗㅗ\n");	
-	if (legFlag)
+	if (legFlag) // 뒷발 
 	{
 		printf(" ㅗ  ㅗㅗㅗ  \n");
 		printf("  ㅗ \n");
 		legFlag = false;	
 	}
-	else
+	else  // 앞발 
 	{
 		printf("  ㅗㅗㅗ ㅗ \n");
 		printf("       ㅗ  \n");
@@ -85,11 +85,11 @@ void DrawGameOver(const int score)
 	int x = 18; // x축 +방향으로 18 이동
 	int y = 8; // y축 -방향으로 8만큼 이동
 	GotoXY(x, y);
-	printf("===========================");
+	printf("==================================================");
 	GotoXY(x, y + 1);
-	printf("======G A M E O V E R======");
+	printf("================ G A M E O V E R ================");
 	GotoXY(x, y + 2);
-	printf("===========================");
+	printf("==================================================");
 	GotoXY(x - 5, y + 10);
 	printf("점수 :  %d", score);
 	
@@ -101,9 +101,10 @@ void DrawGameOver(const int score)
 // 충돌했으면 true. 아니면 false
 bool isCollision(const int objectX, const int dinoY)
 {
-	//// 오브젝트가 닫힌구간 x 구간 [4,6]구간에 있고 y = 8보다 아래에 있으면 충돌로 처리
 	GotoXY(0, 0);
 	if (objectX <= 6 && objectX >= 4 && dinoY > 8)
+	// 오브젝트가 공룡의 몸 가까이에 왔을 때(오브젝트가 4~6사이에 있을 때)
+	공룡의 높이가 8보다 낮으면 충돌처리
 	{
 		return true;
 	}	
@@ -116,7 +117,7 @@ int main()
 	
 	while(true) // 게임루프 
 	{
-		//게임시작시 초기화 
+		// 게임시작시 초기화 
 		bool isJumping = false;
 		bool isBottom = true;
 		const int gravity = 3; // 중력, 즉 공룡이 떨어지는 속도 설정 
@@ -134,7 +135,7 @@ int main()
 			if (isCollision(objectX, dinoY))
 				break;
 			
-			// space(공백)을 입력받고 걷고있는 상태면 점프
+			// space(공백)을 입력받고 바닥에있으면 점프
 			if (GetKeyDown() == ' ' && isBottom)
 			{
 				isJumping = true;
@@ -151,7 +152,7 @@ int main()
 				dinoY += gravity;	
 			} 
 		
-			// Y가 계속해서 증가하는걸 막기 위해 바닥을 생성 
+			// 바닥 생성 
 			if (dinoY >= DINO_BOTTOM_Y)
 			{
 				dinoY = DINO_BOTTOM_Y;
@@ -165,7 +166,7 @@ int main()
 				objectX = OBJECT_BOTTOM_X;
 			}
 		
-			// 점프의 맨 위를 찍으면 점프가 끝남
+			//  점프했을 때  콘솔창의 맨 위에 도달하면 점프가 끝나면서 하강 
 			if (dinoY <= 3)
 			{
 				isJumping = false;	
@@ -190,3 +191,4 @@ int main()
 	}
 	return 0;
 }
+
