@@ -160,7 +160,7 @@ int main()
 			}
 		
 			//오브젝트가 왼쪽(x의 음의방향)으로 가도록하고 오브젝트의 위치가 왼쪽 끝으로가면 다시 오른쪽 끝으로 소환
-			objectX -= 4; //오브젝트 이동 속도 
+			objectX -= 5; //오브젝트 이동 속도 
 			if(objectX <= 0)
 			{
 				objectX = OBJECT_BOTTOM_X;
